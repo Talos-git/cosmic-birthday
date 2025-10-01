@@ -74,76 +74,78 @@ export const Timeline = ({ birthDate, currentAge }: TimelineProps) => {
         {/* Timeline Track */}
         <div
           ref={timelineRef}
-          className="relative h-24 mb-8 cursor-pointer select-none"
+          className="relative h-24 mb-8 md:mb-12 cursor-pointer select-none overflow-x-auto md:overflow-visible"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
         >
           {/* Background track */}
-          <div className="absolute top-1/2 left-0 right-0 h-2 bg-muted rounded-full transform -translate-y-1/2" />
+          <div className="absolute top-1/2 left-0 right-0 h-2 bg-muted rounded-full transform -translate-y-1/2 min-w-[600px] md:min-w-0" />
 
           {/* Progress track */}
           <div
-            className="absolute top-1/2 left-0 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transform -translate-y-1/2 transition-all duration-300"
+            className="absolute top-1/2 left-0 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transform -translate-y-1/2 transition-all duration-300 min-w-[600px] md:min-w-0"
             style={{ width: `${progressPercentage}%` }}
           />
 
           {/* Milestones */}
-          {milestones.map((age) => {
-            const position = (age / maxAge) * 100;
-            const isPassed = age <= currentAge;
-            const isHovered = hoveredAge === age;
+          <div className="min-w-[600px] md:min-w-0 relative h-full">
+            {milestones.map((age) => {
+              const position = (age / maxAge) * 100;
+              const isPassed = age <= currentAge;
+              const isHovered = hoveredAge === age;
 
-            return (
-              <div
-                key={age}
-                className="absolute top-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                style={{ left: `${position}%` }}
-                onMouseEnter={() => setHoveredAge(age)}
-                onMouseLeave={() => setHoveredAge(null)}
-              >
-                {/* Milestone dot */}
+              return (
                 <div
-                  className={cn(
-                    "w-4 h-4 rounded-full border-2 transition-all duration-300",
-                    isPassed
-                      ? "bg-gradient-to-r from-purple-500 to-pink-500 border-purple-400 scale-110"
-                      : "bg-background border-muted-foreground/50",
-                    isHovered && "scale-150 shadow-lg shadow-purple-500/50"
-                  )}
-                />
-
-                {/* Age label */}
-                <div
-                  className={cn(
-                    "absolute top-6 left-1/2 transform -translate-x-1/2 text-xs font-medium transition-all duration-300 whitespace-nowrap",
-                    isPassed ? "text-foreground" : "text-muted-foreground",
-                    isHovered && "scale-125 text-purple-400"
-                  )}
+                  key={age}
+                  className="absolute top-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                  style={{ left: `${position}%` }}
+                  onMouseEnter={() => setHoveredAge(age)}
+                  onMouseLeave={() => setHoveredAge(null)}
                 >
-                  {age}
-                </div>
+                  {/* Milestone dot */}
+                  <div
+                    className={cn(
+                      "w-4 h-4 rounded-full border-2 transition-all duration-300",
+                      isPassed
+                        ? "bg-gradient-to-r from-purple-500 to-pink-500 border-purple-400 scale-110"
+                        : "bg-background border-muted-foreground/50",
+                      isHovered && "scale-150 shadow-lg shadow-purple-500/50"
+                    )}
+                  />
 
-                {/* Hover tooltip */}
-                {isHovered && (
-                  <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 glass p-3 rounded-lg shadow-xl min-w-[200px] text-center animate-fade-in-scale z-10">
-                    <div className="flex items-center justify-center gap-2 mb-1">
-                      <Sparkles className="w-4 h-4 text-purple-400" />
-                      <span className="font-bold text-foreground">{age} Years</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {getMilestoneInfo(age)}
-                    </p>
+                  {/* Age label */}
+                  <div
+                    className={cn(
+                      "absolute top-6 left-1/2 transform -translate-x-1/2 text-xs font-medium transition-all duration-300 whitespace-nowrap",
+                      isPassed ? "text-foreground" : "text-muted-foreground",
+                      isHovered && "scale-125 text-purple-400"
+                    )}
+                  >
+                    {age}
                   </div>
-                )}
-              </div>
-            );
-          })}
+
+                  {/* Hover tooltip */}
+                  {isHovered && (
+                    <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 glass p-3 rounded-lg shadow-xl min-w-[200px] text-center animate-fade-in-scale z-10">
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <Sparkles className="w-4 h-4 text-purple-400" />
+                        <span className="font-bold text-foreground">{age} Years</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {getMilestoneInfo(age)}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
 
           {/* Draggable scrubber */}
           <div
-            className="absolute top-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-150"
+            className="absolute top-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-150 min-w-[600px] md:min-w-0"
             style={{ left: `${(scrubberAge / maxAge) * 100}%` }}
           >
             <div className="relative">
