@@ -86,7 +86,7 @@ export const AgeDisplay = ({ birthDate, country }: AgeDisplayProps) => {
             variant="outline"
           >
             <Instagram className="w-4 h-4 mr-2" />
-            {isSharing ? "Generating..." : "Share Stats to Instagram Stories"}
+            {isSharing ? "Generating..." : "Share to Instagram Stories"}
           </Button>
         </div>
       </div>

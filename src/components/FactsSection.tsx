@@ -118,7 +118,7 @@ export const FactsSection = ({ birthDate, currentAge, country, stats }: FactsSec
 
   return (
     <div className="w-full max-w-7xl mx-auto mt-12 animate-fade-in" style={{ animationDelay: '700ms' }}>
-      <div className="text-center mb-8">
+      <div className="text-center mb-3">
         <div className="flex items-center justify-center gap-2 mb-2">
           <Sparkles className="w-6 h-6 text-accent" />
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-amber-400 bg-clip-text text-transparent">
@@ -155,6 +155,17 @@ export const FactsSection = ({ birthDate, currentAge, country, stats }: FactsSec
 
       {data && facts.length > 0 && (
         <div className="space-y-4" id="facts-section-all">
+          <div className="flex justify-center mb-4">
+            <Button
+              onClick={handleShareToInstagram}
+              disabled={isSharing}
+              variant="outline"
+              className="glass hover:glow-purple transition-all"
+            >
+              <Instagram className="w-4 h-4 mr-2" />
+              {isSharing ? "Generating..." : "Share to Instagram Stories"}
+            </Button>
+          </div>
           <div className="text-center mb-4">
             <p className="text-sm text-muted-foreground">
               Select up to 2 facts to include in your Instagram Story ({selectedFactIndices.length}/2 selected)
@@ -172,15 +183,7 @@ export const FactsSection = ({ birthDate, currentAge, country, stats }: FactsSec
               />
             ))}
           </div>
-          <div className="flex justify-center gap-4 mt-6">
-            <Button
-              onClick={handleRefresh}
-              variant="outline"
-              className="glass hover:glow-purple transition-all"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Regenerate Facts
-            </Button>
+          <div className="flex flex-col items-center gap-4">
             <Button
               onClick={handleShareToInstagram}
               disabled={isSharing}
@@ -188,7 +191,15 @@ export const FactsSection = ({ birthDate, currentAge, country, stats }: FactsSec
               className="glass hover:glow-purple transition-all"
             >
               <Instagram className="w-4 h-4 mr-2" />
-              {isSharing ? "Generating..." : "Share Facts to Instagram Stories"}
+              {isSharing ? "Generating..." : "Share to Instagram Stories"}
+            </Button>
+            <Button
+              onClick={handleRefresh}
+              variant="outline"
+              className="glass hover:glow-purple transition-all"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Regenerate Facts
             </Button>
           </div>
 
