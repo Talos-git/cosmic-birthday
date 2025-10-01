@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { StatCard } from "./StatCard";
 import { Timeline } from "./Timeline";
+import { FactsSection } from "./FactsSection";
 import { calculateAge, formatNumber, type AgeStats } from "@/utils/ageCalculations";
 import { Calendar, Clock, Sparkles, PartyPopper, Cake, Timer } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -125,6 +126,9 @@ export const AgeDisplay = ({ birthDate }: AgeDisplayProps) => {
       <div className="mt-12 animate-fade-in" style={{ animationDelay: '600ms' }}>
         <Timeline birthDate={birthDate} currentAge={stats.years} />
       </div>
+
+      {/* Personalized Facts Section */}
+      <FactsSection birthDate={birthDate} currentAge={stats.years} />
     </div>
   );
 };
