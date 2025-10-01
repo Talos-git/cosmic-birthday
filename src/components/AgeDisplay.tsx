@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { StatCard } from "./StatCard";
+import { Timeline } from "./Timeline";
 import { calculateAge, formatNumber, type AgeStats } from "@/utils/ageCalculations";
 import { Calendar, Clock, Sparkles, PartyPopper, Cake, Timer } from "lucide-react";
+import confetti from "canvas-confetti";
 
 interface AgeDisplayProps {
   birthDate: Date;
@@ -9,6 +11,7 @@ interface AgeDisplayProps {
 
 export const AgeDisplay = ({ birthDate }: AgeDisplayProps) => {
   const [stats, setStats] = useState<AgeStats>(calculateAge(birthDate));
+  const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false);
 
   useEffect(() => {
     // Update seconds counter every second
@@ -18,6 +21,19 @@ export const AgeDisplay = ({ birthDate }: AgeDisplayProps) => {
 
     return () => clearInterval(interval);
   }, [birthDate]);
+
+  // Trigger confetti for milestone birthdays
+  useEffect(() => {
+    if (stats.nextMilestone && stats.nextMilestone.days === 0 && !hasTriggeredConfetti) {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#8B5CF6', '#EC4899', '#F59E0B']
+      });
+      setHasTriggeredConfetti(true);
+    }
+  }, [stats.nextMilestone, hasTriggeredConfetti]);
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-8 animate-fade-in">
@@ -103,6 +119,11 @@ export const AgeDisplay = ({ birthDate }: AgeDisplayProps) => {
             glow
           />
         )}
+      </div>
+
+      {/* Interactive Timeline */}
+      <div className="mt-12 animate-fade-in" style={{ animationDelay: '600ms' }}>
+        <Timeline birthDate={birthDate} currentAge={stats.years} />
       </div>
     </div>
   );

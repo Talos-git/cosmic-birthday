@@ -1,14 +1,19 @@
 import { useState } from "react";
 import { DateInput } from "@/components/DateInput";
 import { AgeDisplay } from "@/components/AgeDisplay";
+import { useParallax } from "@/hooks/useParallax";
 
 const Index = () => {
   const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
+  const parallaxOffset = useParallax(0.3);
 
   return (
     <div className="min-h-screen py-8 px-4 relative overflow-hidden">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 gradient-bg opacity-20 -z-10" />
+      {/* Animated gradient background with parallax */}
+      <div
+        className="absolute inset-0 gradient-bg opacity-20 -z-10"
+        style={{ transform: `translateY(${parallaxOffset}px)` }}
+      />
       
       {/* Floating particles effect */}
       <div className="absolute inset-0 -z-10">
