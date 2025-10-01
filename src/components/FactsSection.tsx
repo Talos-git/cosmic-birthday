@@ -3,9 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchPersonalizedFacts } from "@/services/supabase";
 import { FactCard } from "./FactCard";
 import { LoadingSkeleton } from "./LoadingSkeleton";
+import { InstagramStoryGenerator } from "./InstagramStoryGenerator";
 import { Button } from "@/components/ui/button";
-import { Sparkles, RefreshCw } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Sparkles, RefreshCw, Instagram } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { shareStoryToInstagram } from "@/utils/shareToInstagram";
+import { toast } from "sonner";
 
 interface FactsSectionProps {
   birthDate: Date;
@@ -15,6 +19,8 @@ interface FactsSectionProps {
 
 export const FactsSection = ({ birthDate, currentAge, country }: FactsSectionProps) => {
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isSharing, setIsSharing] = useState(false);
+  const [selectedFactIndices, setSelectedFactIndices] = useState<number[]>([]);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["personalizedFacts", birthDate.toISOString(), currentAge, country, refreshKey],
@@ -24,11 +30,61 @@ export const FactsSection = ({ birthDate, currentAge, country }: FactsSectionPro
 
   const handleRefresh = () => {
     setRefreshKey((prev) => prev + 1);
+    setSelectedFactIndices([]);
     refetch();
   };
 
-  // Debug: log the response data
-  console.log("Facts data:", data);
+  const handleFactSelection = (index: number, checked: boolean) => {
+    if (checked) {
+      // Add to selection if less than 3 facts are selected
+      if (selectedFactIndices.length < 3) {
+        setSelectedFactIndices([...selectedFactIndices, index]);
+      }
+    } else {
+      // Remove from selection
+      setSelectedFactIndices(selectedFactIndices.filter((i) => i !== index));
+    }
+  };
+
+  const handleShareToInstagram = async () => {
+    // If no facts are selected, ask user
+    if (selectedFactIndices.length === 0) {
+      const shouldAddFacts = window.confirm(
+        "Would you like to add some facts (max 3) to the story? Select facts and try again, or click Cancel to continue without facts."
+      );
+      if (shouldAddFacts) {
+        toast.info("Please select up to 3 facts to include in your story.");
+        return;
+      }
+      // User clicked Cancel, continue without facts - still capture the section
+    }
+
+    setIsSharing(true);
+    try {
+      // If facts are selected, capture the Instagram story, otherwise capture all
+      const result = await shareStoryToInstagram(
+        selectedFactIndices.length > 0 ? "instagram-story-facts" : "facts-section-all",
+        `cosmic-birthday-facts-${new Date().getTime()}.png`
+      );
+
+      if (result.success) {
+        if ("method" in result && result.method === "share") {
+          toast.success("Shared successfully!");
+        } else {
+          toast.success("Image downloaded! You can now upload it to Instagram Stories.");
+        }
+      } else {
+        if ("error" in result) {
+          toast.error(result.error || "Failed to share");
+        }
+      }
+    } catch (error) {
+      toast.error("An error occurred while sharing");
+      console.error(error);
+    } finally {
+      setIsSharing(false);
+    }
+  };
 
   // Transform nested object structure to flat array
   const facts = data?.facts ? (() => {
@@ -97,13 +153,25 @@ export const FactsSection = ({ birthDate, currentAge, country }: FactsSectionPro
       )}
 
       {data && facts.length > 0 && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-4" id="facts-section-all">
+          <div className="text-center mb-4">
+            <p className="text-sm text-muted-foreground">
+              Select up to 3 facts to include in your Instagram Story ({selectedFactIndices.length}/3 selected)
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4" id="all-facts-grid">
             {facts.map((fact, index) => (
-              <FactCard key={index} fact={fact} index={index} />
+              <FactCard
+                key={index}
+                fact={fact}
+                index={index}
+                isSelected={selectedFactIndices.includes(index)}
+                onSelect={handleFactSelection}
+                disabled={selectedFactIndices.length >= 3}
+              />
             ))}
           </div>
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center gap-4 mt-6">
             <Button
               onClick={handleRefresh}
               variant="outline"
@@ -112,7 +180,48 @@ export const FactsSection = ({ birthDate, currentAge, country }: FactsSectionPro
               <RefreshCw className="w-4 h-4 mr-2" />
               Regenerate Facts
             </Button>
+            <Button
+              onClick={handleShareToInstagram}
+              disabled={isSharing}
+              variant="outline"
+              className="glass hover:glow-purple transition-all"
+            >
+              <Instagram className="w-4 h-4 mr-2" />
+              {isSharing ? "Generating..." : "Share Facts to Instagram Stories"}
+            </Button>
           </div>
+
+          {/* Selected facts for Instagram Story */}
+          {selectedFactIndices.length > 0 && (
+            <div id="facts-story-content" className="hidden">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 via-pink-400 to-amber-400 bg-clip-text text-transparent">
+                  Your Personalized Facts ✨
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 gap-4 max-w-2xl mx-auto">
+                {selectedFactIndices.map(i => {
+                  const fact = facts[i];
+                  return (
+                    <div key={i} className="glass p-6 rounded-2xl">
+                      <Badge className="mb-3 bg-gradient-to-r from-purple-400 to-pink-400" variant="secondary">
+                        {fact.category}
+                      </Badge>
+                      <p className="text-sm leading-relaxed text-foreground/90">{fact.text}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Hidden Instagram Story Generator for Facts */}
+          {selectedFactIndices.length > 0 && (
+            <InstagramStoryGenerator
+              type="facts"
+              facts={selectedFactIndices.map(i => facts[i])}
+            />
+          )}
         </div>
       )}
     </div>
