@@ -196,7 +196,7 @@ export const DateInput = ({ date, onDateChange, country, onCountryChange }: Date
             <Button
               variant="outline"
               className={cn(
-                "w-full h-14 text-lg glass hover:glow-purple transition-all justify-start",
+                "w-full h-14 text-lg glass hover:glow-purple transition-all",
                 !country && "text-muted-foreground"
               )}
             >
