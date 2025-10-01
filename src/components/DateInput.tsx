@@ -4,13 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { CalendarIcon, MapPin, Check } from "lucide-react";
 import { format, parse, setMonth, setYear, getMonth, getYear } from "date-fns";
 import { cn } from "@/lib/utils";
+import { countries } from "@/utils/countries";
 
 interface DateInputProps {
   date: Date | undefined;
   onDateChange: (date: Date | undefined) => void;
+  country: string | undefined;
+  onCountryChange: (country: string | undefined) => void;
 }
 
 const months = [
@@ -21,10 +25,11 @@ const months = [
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: currentYear - 1899 }, (_, i) => currentYear - i);
 
-export const DateInput = ({ date, onDateChange }: DateInputProps) => {
+export const DateInput = ({ date, onDateChange, country, onCountryChange }: DateInputProps) => {
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState("");
   const [calendarMonth, setCalendarMonth] = useState<Date>(date || new Date());
+  const [countryOpen, setCountryOpen] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, ""); // Remove non-digits
@@ -184,11 +189,56 @@ export const DateInput = ({ date, onDateChange }: DateInputProps) => {
             />
           </PopoverContent>
         </Popover>
+
+        {/* Country Selector */}
+        <Popover open={countryOpen} onOpenChange={setCountryOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-full h-14 text-lg glass hover:glow-purple transition-all justify-start",
+                !country && "text-muted-foreground"
+              )}
+            >
+              <MapPin className="mr-2 h-5 w-5" />
+              {country ? countries.find((c) => c.name === country)?.name : "Select country (optional)"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0 glass" align="center">
+            <Command>
+              <CommandInput placeholder="Search country..." />
+              <CommandList>
+                <CommandEmpty>No country found.</CommandEmpty>
+                <CommandGroup>
+                  {countries.map((c) => (
+                    <CommandItem
+                      key={c.code}
+                      value={c.name}
+                      onSelect={(value) => {
+                        onCountryChange(value === country ? undefined : value);
+                        setCountryOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          country === c.name ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {c.name}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
       </div>
 
       {date && (
         <div className="mt-4 text-center text-sm text-muted-foreground animate-fade-in">
           Selected: {format(date, "MMMM d, yyyy")}
+          {country && ` • ${country}`}
         </div>
       )}
     </div>

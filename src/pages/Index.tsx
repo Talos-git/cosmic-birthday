@@ -5,6 +5,7 @@ import { useParallax } from "@/hooks/useParallax";
 
 const Index = () => {
   const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
+  const [country, setCountry] = useState<string | undefined>(undefined);
   const parallaxOffset = useParallax(0.3);
 
   return (
@@ -14,7 +15,7 @@ const Index = () => {
         className="absolute inset-0 gradient-bg opacity-20 -z-10"
         style={{ transform: `translateY(${parallaxOffset}px)` }}
       />
-      
+
       {/* Floating particles effect */}
       <div className="absolute inset-0 -z-10">
         {[...Array(20)].map((_, i) => (
@@ -34,11 +35,16 @@ const Index = () => {
       </div>
 
       <div className="container mx-auto space-y-12">
-        <DateInput date={birthDate} onDateChange={setBirthDate} />
-        
+        <DateInput
+          date={birthDate}
+          onDateChange={setBirthDate}
+          country={country}
+          onCountryChange={setCountry}
+        />
+
         {birthDate && (
           <div className="animate-fade-in-scale">
-            <AgeDisplay birthDate={birthDate} />
+            <AgeDisplay birthDate={birthDate} country={country} />
           </div>
         )}
 

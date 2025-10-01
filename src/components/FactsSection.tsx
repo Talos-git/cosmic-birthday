@@ -10,14 +10,15 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 interface FactsSectionProps {
   birthDate: Date;
   currentAge: number;
+  country?: string;
 }
 
-export const FactsSection = ({ birthDate, currentAge }: FactsSectionProps) => {
+export const FactsSection = ({ birthDate, currentAge, country }: FactsSectionProps) => {
   const [refreshKey, setRefreshKey] = useState(0);
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["personalizedFacts", birthDate.toISOString(), currentAge, refreshKey],
-    queryFn: () => fetchPersonalizedFacts(birthDate, currentAge),
+    queryKey: ["personalizedFacts", birthDate.toISOString(), currentAge, country, refreshKey],
+    queryFn: () => fetchPersonalizedFacts(birthDate, currentAge, country),
     retry: 2,
   });
 

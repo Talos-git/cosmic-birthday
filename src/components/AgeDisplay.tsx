@@ -8,9 +8,10 @@ import confetti from "canvas-confetti";
 
 interface AgeDisplayProps {
   birthDate: Date;
+  country?: string;
 }
 
-export const AgeDisplay = ({ birthDate }: AgeDisplayProps) => {
+export const AgeDisplay = ({ birthDate, country }: AgeDisplayProps) => {
   const [stats, setStats] = useState<AgeStats>(calculateAge(birthDate));
   const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false);
 
@@ -128,7 +129,7 @@ export const AgeDisplay = ({ birthDate }: AgeDisplayProps) => {
       </div>
 
       {/* Personalized Facts Section */}
-      <FactsSection birthDate={birthDate} currentAge={stats.years} />
+      <FactsSection birthDate={birthDate} currentAge={stats.years} country={country} />
     </div>
   );
 };

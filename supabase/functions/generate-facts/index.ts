@@ -14,6 +14,7 @@ interface GenerateFactsRequest {
     months: number
     days: number
   }
+  country?: string
 }
 
 interface PersonalizedFacts {
@@ -48,28 +49,29 @@ function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-async function fetchHistoricalData(birthdate: string, apiKey: string): Promise<SearchResults> {
+async function fetchHistoricalData(birthdate: string, apiKey: string, country?: string): Promise<SearchResults> {
   const date = new Date(birthdate)
   const year = date.getFullYear()
   const monthDay = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+  const countryFilter = country ? ` ${country}` : ''
 
   try {
-    // Search for historical events on birth date
-    const eventsQuery = `historical events ${monthDay} ${year}`
+    // Search for historical events on birth date (country-specific if provided)
+    const eventsQuery = `historical events${countryFilter} ${monthDay} ${year}`
     const eventsData = await searchBraveAPI(eventsQuery, apiKey)
 
     // Wait 1.1 seconds between requests (free tier: 1 request per second)
     await delay(1100)
 
-    // Search for pop culture from birth year
-    const popCultureQuery = `popular movies music ${year}`
+    // Search for pop culture from birth year (country-specific if provided)
+    const popCultureQuery = `popular movies music${countryFilter} ${year}`
     const popCultureData = await searchBraveAPI(popCultureQuery, apiKey)
 
     // Wait 1.1 seconds between requests
     await delay(1100)
 
-    // Search for notable people born same day
-    const celebrityQuery = `celebrities born ${monthDay}`
+    // Search for notable people born same day (country-specific if provided)
+    const celebrityQuery = `celebrities${countryFilter} born ${monthDay}`
     const celebrityData = await searchBraveAPI(celebrityQuery, apiKey)
 
     return {
@@ -161,11 +163,11 @@ Deno.serve(async (req) => {
     // Try to generate facts with APIs, fallback if they fail
     if (geminiApiKey && braveApiKey) {
       try {
-        // Fetch historical data from Brave Search
-        const searchResults = await fetchHistoricalData(requestData.birthdate, braveApiKey)
+        // Fetch historical data from Brave Search (with country if provided)
+        const searchResults = await fetchHistoricalData(requestData.birthdate, braveApiKey, requestData.country)
 
-        // Build prompt with search results
-        const prompt = buildGeminiPrompt(requestData.birthdate, requestData.currentAge, searchResults)
+        // Build prompt with search results (with country if provided)
+        const prompt = buildGeminiPrompt(requestData.birthdate, requestData.currentAge, searchResults, requestData.country)
 
         // Generate facts with Gemini
         facts = await generateFactsWithGemini(prompt, geminiApiKey)
@@ -183,7 +185,8 @@ Deno.serve(async (req) => {
         success: true,
         facts,
         birthdate: requestData.birthdate,
-        age: requestData.currentAge
+        age: requestData.currentAge,
+        country: requestData.country
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
