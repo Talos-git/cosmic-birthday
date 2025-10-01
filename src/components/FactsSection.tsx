@@ -15,9 +15,10 @@ interface FactsSectionProps {
   birthDate: Date;
   currentAge: number;
   country?: string;
+  stats?: any;
 }
 
-export const FactsSection = ({ birthDate, currentAge, country }: FactsSectionProps) => {
+export const FactsSection = ({ birthDate, currentAge, country, stats }: FactsSectionProps) => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [isSharing, setIsSharing] = useState(false);
   const [selectedFactIndices, setSelectedFactIndices] = useState<number[]>([]);
@@ -36,8 +37,8 @@ export const FactsSection = ({ birthDate, currentAge, country }: FactsSectionPro
 
   const handleFactSelection = (index: number, checked: boolean) => {
     if (checked) {
-      // Add to selection if less than 3 facts are selected
-      if (selectedFactIndices.length < 3) {
+      // Add to selection if less than 2 facts are selected
+      if (selectedFactIndices.length < 2) {
         setSelectedFactIndices([...selectedFactIndices, index]);
       }
     } else {
@@ -50,10 +51,10 @@ export const FactsSection = ({ birthDate, currentAge, country }: FactsSectionPro
     // If no facts are selected, ask user
     if (selectedFactIndices.length === 0) {
       const shouldAddFacts = window.confirm(
-        "Would you like to add some facts (max 3) to the story? Select facts and try again, or click Cancel to continue without facts."
+        "Would you like to add some facts (max 2) to the story? Select facts and try again, or click Cancel to continue without facts."
       );
       if (shouldAddFacts) {
-        toast.info("Please select up to 3 facts to include in your story.");
+        toast.info("Please select up to 2 facts to include in your story.");
         return;
       }
       // User clicked Cancel, continue without facts - still capture the section
@@ -63,7 +64,7 @@ export const FactsSection = ({ birthDate, currentAge, country }: FactsSectionPro
     try {
       // If facts are selected, capture the Instagram story, otherwise capture all
       const result = await shareStoryToInstagram(
-        selectedFactIndices.length > 0 ? "instagram-story-facts" : "facts-section-all",
+        selectedFactIndices.length > 0 ? "instagram-story-combined" : "facts-section-all",
         `cosmic-birthday-facts-${new Date().getTime()}.png`
       );
 
@@ -156,7 +157,7 @@ export const FactsSection = ({ birthDate, currentAge, country }: FactsSectionPro
         <div className="space-y-4" id="facts-section-all">
           <div className="text-center mb-4">
             <p className="text-sm text-muted-foreground">
-              Select up to 3 facts to include in your Instagram Story ({selectedFactIndices.length}/3 selected)
+              Select up to 2 facts to include in your Instagram Story ({selectedFactIndices.length}/2 selected)
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4" id="all-facts-grid">
@@ -167,7 +168,7 @@ export const FactsSection = ({ birthDate, currentAge, country }: FactsSectionPro
                 index={index}
                 isSelected={selectedFactIndices.includes(index)}
                 onSelect={handleFactSelection}
-                disabled={selectedFactIndices.length >= 3}
+                disabled={selectedFactIndices.length >= 2}
               />
             ))}
           </div>
@@ -218,7 +219,8 @@ export const FactsSection = ({ birthDate, currentAge, country }: FactsSectionPro
           {/* Hidden Instagram Story Generator for Facts */}
           {selectedFactIndices.length > 0 && (
             <InstagramStoryGenerator
-              type="facts"
+              stats={stats}
+              birthDate={birthDate}
               facts={selectedFactIndices.map(i => facts[i])}
             />
           )}

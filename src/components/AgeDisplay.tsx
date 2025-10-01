@@ -46,7 +46,7 @@ export const AgeDisplay = ({ birthDate, country }: AgeDisplayProps) => {
     setIsSharing(true);
     try {
       const result = await shareStoryToInstagram(
-        "instagram-story-stats",
+        "instagram-story-combined",
         `cosmic-birthday-${new Date().getTime()}.png`
       );
 
@@ -207,11 +207,10 @@ export const AgeDisplay = ({ birthDate, country }: AgeDisplayProps) => {
       </div>
 
       {/* Personalized Facts Section */}
-      <FactsSection birthDate={birthDate} currentAge={stats.years} country={country} />
+      <FactsSection birthDate={birthDate} currentAge={stats.years} country={country} stats={stats} />
 
       {/* Hidden Instagram Story Generator for Stats */}
       <InstagramStoryGenerator
-        type="stats"
         stats={stats}
         birthDate={birthDate}
       />

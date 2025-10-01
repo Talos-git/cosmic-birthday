@@ -98,11 +98,18 @@ Generate 8-12 fun, engaging facts categorized as follows. Return ONLY valid JSON
   ]
 }
 
+🔴 CRITICAL LENGTH REQUIREMENT:
+- **EVERY FACT MUST BE MAXIMUM 50 WORDS**
+- Count the words before including any fact
+- If a fact exceeds 50 words, rewrite it to be more concise
+- Shorter is better - aim for 30-40 words when possible
+
 Make the facts:
 - Specific and personal (use "you" and "your")
 - Fun and engaging (not boring history lessons)
 - Accurate based on the provided data
 - **MATHEMATICALLY CORRECT - verify all age calculations**
+- **MAXIMUM 50 WORDS PER FACT - NO EXCEPTIONS**
 - Varied in tone (some nostalgic, some surprising, some humorous)
 - Include specific numbers and dates when relevant
 ${country ? `- EVERY SINGLE FACT MUST BE ABOUT ${country} - NO EXCEPTIONS\n- Use ${country}-specific names, places, and events\n- Reference ${country} leaders, not US or other country leaders` : ''}
