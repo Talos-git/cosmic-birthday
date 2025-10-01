@@ -37,7 +37,7 @@ export const StatCard = ({
         <div className="flex justify-center mb-3 text-primary">
           {icon}
         </div>
-        <div className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+        <div className="text-4xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
           {animate && isNumeric ? (
             <CountUp
               end={numericValue}
